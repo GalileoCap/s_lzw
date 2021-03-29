@@ -1,0 +1,3 @@
+/home/galileo/devel/projects/galifiles/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/galileo/devel/projects/galifiles/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/galileo/devel/projects/galifiles/cmake-build-debug/CMakeFiles/galifiles.dir
