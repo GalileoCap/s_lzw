@@ -7,6 +7,12 @@
 #IncludeRegexTransform: 
 
 /home/galileo/devel/projects/galifiles/main.cpp
+fstream
+-
+vector
+-
+string
+-
 iostream
 -
 
