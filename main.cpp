@@ -1,8 +1,33 @@
 #include <fstream>
+#include <streambuf>
 #include <vector>
 #include <string>
 #include <iostream>
 using namespace std;
+
+string read_decompressed_file(const string& file) {
+   ifstream fin(file); fin >> noskipws;
+   string str;
+   fin.seekg(0, std::ios::end); str.reserve(fin.tellg()); fin.seekg(0, std::ios::beg);
+   str.assign((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
+   return str;
+}
+
+void write_decompressed_file(const string& file, const string& out) {
+    ofstream fout(file); fout << out;
+}
+
+vector<int> read_coded_file(const string& file) {
+    vector<int> coded; int code;
+    ifstream fin(file);
+    while (!fin.eof()) { fin >> code; coded.push_back(code); }
+    return coded;
+}
+
+void write_coded_file(const string& file, const vector<int>& coded) {
+    ofstream fout(file);
+    for (const int& code : coded) { fout << code << ' '; }
+}
 
 struct CompressDict {
     vector<string> keys; vector<int> values;
@@ -35,7 +60,6 @@ vector<int> compress(const string& s) {
             w = k;
         }
     }
-    res.push_back(dict.get(w));
 
     return res;
 }
@@ -74,12 +98,56 @@ string decompress(const vector<int>& coded) {
     return res;
 }
 
-int main() {
+int main(int argc, char **argv) {
+    if (argc == 1) {
+        cerr << "INVALID INPUT\nUSE -h FOR HELP" << endl;
+        return 0;
+    }
 
-    vector<int> test = compress("compadre no compro coco");
-    string ing = decompress(test);
-    cout << ing;
+    bool extras = false, file = false, to_decompress = false, out = false, help = false;
+    if (argc > 2) {
+        for (const char &c : string(argv[1])) {
+            extras |= c == '-';
+            file |= c == 'f';
+            to_decompress |= c == 'd';
+            out |= c == 'o';
+            help |= c == 'h';
+        }
+    }
 
-    return 0;
+    if (help) {
+        //TODO: Help
+    }
+
+    if (!to_decompress) { //A: Compress
+        string message;
+        if (file) { //A: Read from file
+            message = read_decompressed_file(argv[2]);
+        } else { //A: Read from command line
+            if (argc > 2) {
+                message = argv[2];
+            } else {
+                message = argv[1];
+            }
+        }
+        vector<int> coded = compress(message);
+
+        if (out) {
+            write_coded_file(argv[3], coded);
+        } else {
+            for (const int& code : coded) { cout << code << ' '; }
+        }
+    } else { //A: Decompress
+        vector<int> coded;
+        coded = read_coded_file(argv[2]);
+        string message = decompress(coded);
+        if (out) {
+            write_decompressed_file(argv[3], message);
+        } else {
+            cout << message << endl;
+        }
+    }
+
+    return 1;
 
 }
